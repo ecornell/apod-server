@@ -1,3 +1,5 @@
+config = require("./config")
+
 async = require("async")
 restify = require("restify")
 server = restify.createServer({
@@ -15,16 +17,13 @@ getSysInfo = (req, res, next) ->
     info: (callback) ->
       rc.info (err, reply) ->
         callback null, reply
-    top: (callback) ->
+    top: (callback) ->  
       rc.zrevrange "apod:rank", 0, -1, (err, reply) ->
         callback null, reply
 
   , (err, results) ->
 
     body = results.info + "\r\r" + results.top
-
-    console.log results.top
-
 
     res.header "Content-Length", Buffer.byteLength( body )
     res.send body
@@ -67,9 +66,7 @@ putVote = (req, res, next) ->
 
   res.send 200, '0'
 
-
 #------- 
-
 
 server.use restify.bodyParser()
 server.use restify.queryParser()
@@ -78,7 +75,7 @@ server.get "/sysinfo", getSysInfo
 server.get "/info/:photoid", getInfo
 server.put "/vote/:photoid/:score", putVote
 
-server.listen 9999, ->
+server.listen config.web.port, ->
   console.log "%s listening at %s", server.name, server.url
 
 
