@@ -72,7 +72,7 @@
       avg = results.score / results.votes;
       return rc.zadd("apod:rank", avg, key_id);
     });
-    return res.send(200, '0');
+    return res.send('0');
   };
 
   server.use(restify.bodyParser());

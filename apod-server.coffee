@@ -10,14 +10,14 @@ rc = require("redis").createClient()
 #-------
 
 getSysInfo = (req, res, next) ->
-  
+
   res.header "Content-Type", "text/plain"
 
   async.parallel
     info: (callback) ->
       rc.info (err, reply) ->
         callback null, reply
-    top: (callback) ->  
+    top: (callback) ->
       rc.zrevrange "apod:rank", 0, -1, (err, reply) ->
         callback null, reply
 
@@ -29,7 +29,7 @@ getSysInfo = (req, res, next) ->
     res.send body
 
 getInfo = (req, res, next) ->
-  
+
   key_id = "apod:" + req.params.photoid
 
   async.parallel
@@ -59,14 +59,14 @@ putVote = (req, res, next) ->
         callback null, reply
 
   , (err, results) ->
-    
+
     avg = results.score / results.votes
     rc.zadd "apod:rank", avg, key_id
 
 
-  res.send 200, '0'
+  res.send '0'
 
-#------- 
+#-------
 
 server.use restify.bodyParser()
 server.use restify.queryParser()
@@ -76,6 +76,4 @@ server.get "/info/:photoid", getInfo
 server.put "/vote/:photoid/:score", putVote
 
 server.listen config.web.port, ->
-  console.log "%s listening at %s", server.name, server.url
-
-
+  console.log "%s listening at %s !", server.name, server.url
