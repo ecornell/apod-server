@@ -9,5 +9,8 @@
     "redis": ">= 0.8.1",
     "restify": ">= 1.4.4"
   },
-  "engine": "node >= 0.8.12"
+  "engines": {
+    "node": "0.8.x",
+    "npm":  "1.1.x"
+  }
 }
