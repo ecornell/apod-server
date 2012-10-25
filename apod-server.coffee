@@ -63,7 +63,6 @@ putVote = (req, res, next) ->
     avg = results.score / results.votes
     rc.zadd "apod:rank", avg, key_id
 
-
   res.send '0'
 
 #-------
@@ -76,4 +75,4 @@ server.get "/info/:photoid", getInfo
 server.put "/vote/:photoid/:score", putVote
 
 server.listen config.web.port, ->
-  console.log "%s listening at %s !", server.name, server.url
+  console.log "%s listening at %s", server.name, server.url
