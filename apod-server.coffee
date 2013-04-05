@@ -43,27 +43,32 @@ getInfo = (req, res, next) ->
 
 putVote = (req, res, next) ->
 
-  key_id = "apod:" + req.params.photoid
-  key_votes = key_id + ":votes"
-  key_score = key_id + ":total_score"
+  token = req.header('APOD');
+  if token == '41020780-9e3a-11e2-9e96-0800200c9a66'
 
-  rc.incr key_votes
-  rc.incrby key_score, req.params.score
+    key_id = "apod:" + req.params.photoid
+    key_votes = key_id + ":votes"
+    key_score = key_id + ":total_score"
 
-  async.parallel
-    votes: (callback) ->
-      rc.get key_votes, (err, reply) ->
-        callback null, reply
-    score: (callback) ->
-      rc.get key_score, (err, reply) ->
-        callback null, reply
+    rc.incr key_votes
+    rc.incrby key_score, req.params.score
 
-  , (err, results) ->
+    async.parallel
+      votes: (callback) ->
+        rc.get key_votes, (err, reply) ->
+          callback null, reply
+      score: (callback) ->
+        rc.get key_score, (err, reply) ->
+          callback null, reply
 
-    avg = results.score / results.votes
-    rc.zadd "apod:rank", avg, key_id
+    , (err, results) ->
 
-  res.send '0'
+      avg = results.score / results.votes
+      rc.zadd "apod:rank", avg, key_id
+
+    res.send '0'
+  else
+    res.send '-1'
 
 #-------
 

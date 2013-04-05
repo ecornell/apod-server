@@ -50,29 +50,34 @@
   };
 
   putVote = function(req, res, next) {
-    var key_id, key_score, key_votes;
-    key_id = "apod:" + req.params.photoid;
-    key_votes = key_id + ":votes";
-    key_score = key_id + ":total_score";
-    rc.incr(key_votes);
-    rc.incrby(key_score, req.params.score);
-    async.parallel({
-      votes: function(callback) {
-        return rc.get(key_votes, function(err, reply) {
-          return callback(null, reply);
-        });
-      },
-      score: function(callback) {
-        return rc.get(key_score, function(err, reply) {
-          return callback(null, reply);
-        });
-      }
-    }, function(err, results) {
-      var avg;
-      avg = results.score / results.votes;
-      return rc.zadd("apod:rank", avg, key_id);
-    });
-    return res.send('0');
+    var key_id, key_score, key_votes, token;
+    token = req.header('APOD');
+    if (token === '41020780-9e3a-11e2-9e96-0800200c9a66') {
+      key_id = "apod:" + req.params.photoid;
+      key_votes = key_id + ":votes";
+      key_score = key_id + ":total_score";
+      rc.incr(key_votes);
+      rc.incrby(key_score, req.params.score);
+      async.parallel({
+        votes: function(callback) {
+          return rc.get(key_votes, function(err, reply) {
+            return callback(null, reply);
+          });
+        },
+        score: function(callback) {
+          return rc.get(key_score, function(err, reply) {
+            return callback(null, reply);
+          });
+        }
+      }, function(err, results) {
+        var avg;
+        avg = results.score / results.votes;
+        return rc.zadd("apod:rank", avg, key_id);
+      });
+      return res.send('0');
+    } else {
+      return res.send('-1');
+    }
   };
 
   server.use(restify.bodyParser());
